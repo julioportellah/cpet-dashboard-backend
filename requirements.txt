@@ -1,0 +1,13 @@
+jupyter
+pandas
+numpy
+scikit-learn
+xlrd
+flask
+matplotlib
+seaborn
+ipykernel
+shap
+imblearn
+typing-extensions
+flask-cors
