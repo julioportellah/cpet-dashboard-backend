@@ -1,7 +1,11 @@
 from . import colors
 import numpy as np
 import matplotlib.pyplot as pl
-
+import uuid
+import base64
+import os
+import matplotlib
+matplotlib.use('Agg')
 
 labels = {
     'MAIN_EFFECT': "SHAP main effect value for\n%s",
@@ -20,9 +24,9 @@ labels = {
 }
 
 
-def summary_with_highlight(shap_values, features=None, max_display=None, row_highlight=None,sort=True,plot_size="auto", 
-                            axis_color="#333333",plot_type='dot',alpha=1,cmap=colors.red_blue, alt_cmap = colors.red_blue,
-                            show=True, class_inds=None, color_bar_label=labels["FEATURE_VALUE"],color_bar=True):
+def summary_with_highlight(shap_values, features=None, max_display=None, row_highlight=None, sort=True, plot_size="auto",
+                           axis_color="#333333", plot_type='dot', alpha=1, cmap=colors.red_blue, alt_cmap=colors.red_blue,
+                           show=True, class_inds=None, color_bar_label=labels["FEATURE_VALUE"], color_bar=True, as_string=False):
     color = colors.blue_rgb
 
     idx2cat = None
@@ -131,7 +135,7 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
                 if row_highlight is not None:
                     col_green = np.array(["yellow"])
                     pl.scatter(xxx[row_highlight], pos,#yyy[-1],
-                           cmap=None, vmin=vmin, vmax=vmax, s=64,
+                           cmap=None, vmin=vmin, vmax=vmax, s=128,
                            c=col_green, 
                            alpha=alpha, linewidth=0,
                            zorder=3, rasterized=len(shaps) > 500)
@@ -171,6 +175,18 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
         pl.xlabel(labels['GLOBAL_VALUE'], fontsize=13)
     else:
         pl.xlabel(labels['VALUE'], fontsize=13)
-    if show:
+    if as_string:
+        file_name = str(uuid.uuid4())+".png"
+        pl.tight_layout()
+        pl.savefig('.\\temp_images\\'+file_name,dpi=pl.gcf().dpi)
+        with open('.\\temp_images\\'+file_name, 'rb') as image_file:
+            b64_bytes = base64.b64encode(image_file.read())
+        b64_string = str(b64_bytes, encoding='utf-8')
+        os.remove('.\\temp_images\\'+file_name)
+        #pl.show(block=False)
+        pl.close()
+        return b64_string
+        pass
+    elif show:
         pl.show()
     pass
