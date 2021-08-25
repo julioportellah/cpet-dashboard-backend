@@ -64,6 +64,7 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
         pl.gcf().set_size_inches(8, len(feature_order) * plot_size + 1.5)
     pl.axvline(x=0, color="#999999", zorder=-1)
 
+
     if plot_type == "dot":
         for pos, i in enumerate(feature_order):
             pl.axhline(y=pos, color="#cccccc", lw=0.5, dashes=(1, 5), zorder=-1)
@@ -136,7 +137,7 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
 
                 if row_highlight is not None:
                     col_green = np.array(["yellow"])
-                    pl.scatter(xxx[row_highlight], pos,#yyy[-1],
+                    pl.scatter(shap_values[row_highlight][i], pos,#yyy[-1],
                            cmap=None, vmin=vmin, vmax=vmax, s=128,
                            c=col_green, 
                            alpha=alpha, linewidth=0,

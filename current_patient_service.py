@@ -7,6 +7,10 @@ from custom_shap import summary_with_highlight
 import uuid
 import base64
 import os
+from PIL import Image as img
+from matplotlib import pyplot as plt
+import matplotlib.pyplot as pl; 
+
 
 class PatientFullPrediction():
     def __init__(self, session_id, patient_id, cardiac_proba, cardiac_lim, pulmonary_proba,
@@ -39,10 +43,14 @@ class PatientDynamicFullPrediction():
 
 
 class CPETInterpretationImages():
-    def __init__(self, cardiac_summary, pulmonary_summary, other_summary) -> None:
+    def __init__(self, cardiac_summary, cardiac_force, pulmonary_summary, pulmonary_force, 
+                other_summary, other_force) -> None:
         self.cardiac_summary = cardiac_summary
+        self.cardiac_force = cardiac_force
         self.pulmonary_summary = pulmonary_summary
+        self.pulmonary_force = pulmonary_force
         self.other_summary = other_summary
+        self.other_force = other_force
         pass
 
 
@@ -78,29 +86,74 @@ def get_interpretation_images_by_id(session_id):
         feature_selector = None
         for lim_type in lim_types:
             if lim_type == 'cardiac':
-                # selected_model = pickle.load(
-                #     open('.\\models\\cardiac\\clf_cardiac_100.sav', 'rb'))
                 feature_selector = cardiac_data_100[1:]
             elif lim_type == 'pulmonary':
-                # selected_model = pickle.load(
-                #     open('.\\models\\pulmonary\\clf_pulmonary_100.sav', 'rb'))
                 feature_selector = pulmonary_data_100[1:]
             else:
-                # selected_model = pickle.load(
-                #     open('.\\models\\other\\clf_other_100.sav', 'rb'))
                 feature_selector = other_data_100[1:]
-            #explainer = shap.TreeExplainer(selected_model, data=data_df[feature_selector])
-            #shap_values = explainer.shap_values(data_df[feature_selector])
             shap_values = pickle.load(
                     open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
             data_index = data_df.loc[data_df['SessionId'] == session_id].index[0]
             pl_result = summary_with_highlight(shap_values[1], data_df[feature_selector], row_highlight=data_index, max_display=10, as_string=True)
             image_list_str.append(pl_result)
-        result = CPETInterpretationImages(image_list_str[0],image_list_str[1],image_list_str[2])
+            force_pl_str = create_force_plot_string(lim_type, data_index)
+            image_list_str.append(force_pl_str)
+        result = CPETInterpretationImages(image_list_str[0],image_list_str[1],image_list_str[2],
+                                        image_list_str[3],image_list_str[4],image_list_str[5])
         return result, 200
     except Exception as e:
         print(e)
         return "Unexpected error", 400
+    pass
+
+
+def create_force_plot_string(lim_type, data_index):
+    file_name = str(uuid.uuid4())
+    file_name_png = file_name + '.png'
+    file_name_jpg = file_name + '.jpg'
+    feature_selector = None
+    if lim_type == 'cardiac':
+        feature_selector = cardiac_data_100[1:]
+    elif lim_type == 'pulmonary':
+        feature_selector = pulmonary_data_100[1:]
+    else:
+        feature_selector = other_data_100[1:]
+    loaded_tree = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
+    shap_values = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
+    shap.force_plot(loaded_tree.expected_value[1], shap_values[1][data_index], feature_names=feature_selector,
+            link='identity', contribution_threshold=0.1,show=False, plot_cmap=['#77dd77', '#f99191'],
+            matplotlib=True).savefig('.\\temp_images\\'+file_name_png,format = "png",dpi = 150,bbox_inches = 'tight')
+    png_img = img.open('.\\temp_images\\'+file_name_png)
+    rgb_im = png_img.convert('RGB')
+    rgb_im.save('.\\temp_images\\'+file_name_jpg,'JPEG')
+    with open('.\\temp_images\\'+file_name_jpg, 'rb') as image_file:
+            b64_bytes = base64.b64encode(image_file.read())
+    b64_string = str(b64_bytes, encoding='utf-8')
+    plt.close()
+    os.remove('.\\temp_images\\'+file_name_png)
+    os.remove('.\\temp_images\\'+file_name_jpg)
+    return b64_string
+    pass
+
+def _test_force_plot():
+    #shap.initjs()
+    f = pl.gcf()
+    lim_type = 'cardiac'
+    loaded_tree = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
+    shap_values = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
+    shap.force_plot(loaded_tree.expected_value[1], shap_values[-1][0], feature_names=cardiac_data_100[1:],
+            link='identity', contribution_threshold=0.1,show=False, plot_cmap=['#77dd77', '#f99191'],
+            matplotlib=True).savefig('.\\temp_images\\'+'scratch.png',format = "png",dpi = 150,bbox_inches = 'tight')
+    # shap.force_plot(loaded_tree.expected_value[1], shap_values[1][0],  feature_names=cardiac_data_100[1:],
+    #                 contribution_threshold=0.9, link='identity', matplotlib=True, show=False)
+    # plt.savefig('.\\temp_images\\'+'scratch2.png')
+    #pl.savefig('.\\temp_images\\'+'scratch.png')
+    #plt.show()
+    # pl.tight_layout()
+    #pl.savefig('.\\temp_images\\'+file_name_png,dpi=pl.gcf().dpi)
+    #cardiac_explainer = shap.TreeExplainer(cardiac_loaded_model, data=data_df[cardiac_top_features])
+    #cardiac_shap_values = cardiac_explainer.shap_values(data_df[cardiac_top_features])
+    # shap.force_plot(cardiac_explainer.expected_value[1], cardiac_shap_values[1][-50,:], feature_names=cardiac_top_features,link='identity', contribution_threshold=0.9, matplotlib=False)
     pass
 
 def _save_tree_explainer_and_shaps():
@@ -230,7 +283,9 @@ def get_cpet_record_by_session_id(session_id):
 
 
 if __name__ == "__main__":
-    _save_tree_explainer_and_shaps()
+    create_force_plot_string('cardiac', 7)
+    _test_force_plot()
+    #_save_tree_explainer_and_shaps()
     #sget_cardiac_cpet_intepretation_by_id("7", "cardiac")
     pass
 
