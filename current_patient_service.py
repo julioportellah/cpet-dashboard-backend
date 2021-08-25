@@ -78,28 +78,64 @@ def get_interpretation_images_by_id(session_id):
         feature_selector = None
         for lim_type in lim_types:
             if lim_type == 'cardiac':
-                selected_model = pickle.load(
-                    open('.\\models\\cardiac\\clf_cardiac_100.sav', 'rb'))
+                # selected_model = pickle.load(
+                #     open('.\\models\\cardiac\\clf_cardiac_100.sav', 'rb'))
                 feature_selector = cardiac_data_100[1:]
             elif lim_type == 'pulmonary':
-                selected_model = pickle.load(
-                    open('.\\models\\pulmonary\\clf_pulmonary_100.sav', 'rb'))
+                # selected_model = pickle.load(
+                #     open('.\\models\\pulmonary\\clf_pulmonary_100.sav', 'rb'))
                 feature_selector = pulmonary_data_100[1:]
             else:
-                selected_model = pickle.load(
-                    open('.\\models\\other\\clf_other_100.sav', 'rb'))
+                # selected_model = pickle.load(
+                #     open('.\\models\\other\\clf_other_100.sav', 'rb'))
                 feature_selector = other_data_100[1:]
-            explainer = shap.TreeExplainer(selected_model, data=data_df[feature_selector])
-            shap_values = explainer.shap_values(data_df[feature_selector])
+            #explainer = shap.TreeExplainer(selected_model, data=data_df[feature_selector])
+            #shap_values = explainer.shap_values(data_df[feature_selector])
+            shap_values = pickle.load(
+                    open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
             data_index = data_df.loc[data_df['SessionId'] == session_id].index[0]
             pl_result = summary_with_highlight(shap_values[1], data_df[feature_selector], row_highlight=data_index, max_display=10, as_string=True)
             image_list_str.append(pl_result)
-        print(len(image_list_str))
         result = CPETInterpretationImages(image_list_str[0],image_list_str[1],image_list_str[2])
         return result, 200
     except Exception as e:
         print(e)
         return "Unexpected error", 400
+    pass
+
+def _save_tree_explainer_and_shaps():
+    data_df= pd.read_csv('.\\data\\data_100.csv')
+    image_list_str = []
+    lim_types = ['cardiac', 'pulmonary', 'other']
+    selected_model = None
+    feature_selector = None
+    for lim_type in lim_types:
+        if lim_type == 'cardiac':
+            selected_model = pickle.load(
+                open('.\\models\\cardiac\\clf_cardiac_100.sav', 'rb'))
+            feature_selector = cardiac_data_100[1:]
+        elif lim_type == 'pulmonary':
+            selected_model = pickle.load(
+                open('.\\models\\pulmonary\\clf_pulmonary_100.sav', 'rb'))
+            feature_selector = pulmonary_data_100[1:]
+        else:
+            selected_model = pickle.load(
+                open('.\\models\\other\\clf_other_100.sav', 'rb'))
+            feature_selector = other_data_100[1:]
+        explainer = shap.TreeExplainer(selected_model, data=data_df[feature_selector])
+        shap_values = explainer.shap_values(data_df[feature_selector])
+        print(explainer)
+        print(shap_values)
+        pickle.dump(explainer, open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav','wb'))
+        pickle.dump(shap_values, open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav','wb'))
+        loaded_explainer = pickle.load(
+                    open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
+        loaded_shap_values = pickle.load(
+                    open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
+
+        print(loaded_explainer)
+        print(loaded_shap_values)
+        print(str(type(loaded_shap_values)))
     pass
 
 def get_cardiac_cpet_intepretation_by_id(session_id, lim_type):
@@ -194,10 +230,7 @@ def get_cpet_record_by_session_id(session_id):
 
 
 if __name__ == "__main__":
-    #session_id = float("78.2")
-    #data_df = pd.read_csv('.\\data\\cpet_full_proba.csv')
-    #print(get_dynamic_cpet_record_by_session_id("78.2"))
-    #print(get_cpet_record_by_session_id("78.2"))
-    get_cardiac_cpet_intepretation_by_id("7", "cardiac")
+    _save_tree_explainer_and_shaps()
+    #sget_cardiac_cpet_intepretation_by_id("7", "cardiac")
     pass
 
