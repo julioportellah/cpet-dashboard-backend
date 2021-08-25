@@ -11,3 +11,4 @@ shap
 imblearn
 typing-extensions
 flask-cors
+Pillow

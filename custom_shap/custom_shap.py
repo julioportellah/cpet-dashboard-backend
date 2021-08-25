@@ -5,6 +5,8 @@ import uuid
 import base64
 import os
 import matplotlib
+from PIL import Image as img
+
 matplotlib.use('Agg')
 
 labels = {
@@ -176,15 +178,22 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
     else:
         pl.xlabel(labels['VALUE'], fontsize=13)
     if as_string:
-        file_name = str(uuid.uuid4())+".png"
+        file_name = str(uuid.uuid4())
+        file_name_png = file_name + ".png"
+        file_name_jpg = file_name +".jpg"
         pl.tight_layout()
-        pl.savefig('.\\temp_images\\'+file_name,dpi=pl.gcf().dpi)
-        with open('.\\temp_images\\'+file_name, 'rb') as image_file:
+        pl.savefig('.\\temp_images\\'+file_name_png,dpi=pl.gcf().dpi)
+        #pl.savefig('.\\temp_images\\'+file_name_jpg,dpi=pl.gcf().dpi)
+        png_img = img.open('.\\temp_images\\'+file_name_png)
+        rgb_im = png_img.convert('RGB')
+        rgb_im.save('.\\temp_images\\'+file_name_jpg,'JPEG')
+        with open('.\\temp_images\\'+file_name_jpg, 'rb') as image_file:
             b64_bytes = base64.b64encode(image_file.read())
         b64_string = str(b64_bytes, encoding='utf-8')
-        os.remove('.\\temp_images\\'+file_name)
         #pl.show(block=False)
         pl.close()
+        os.remove('.\\temp_images\\'+file_name_png)
+        os.remove('.\\temp_images\\'+file_name_jpg)
         return b64_string
         pass
     elif show:

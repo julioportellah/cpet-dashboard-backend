@@ -38,6 +38,14 @@ class PatientDynamicFullPrediction():
     pass
 
 
+class CPETInterpretationImages():
+    def __init__(self, cardiac_summary, pulmonary_summary, other_summary) -> None:
+        self.cardiac_summary = cardiac_summary
+        self.pulmonary_summary = pulmonary_summary
+        self.other_summary = other_summary
+        pass
+
+
 def _generate_array(df, type_lim):
     result = []
     time_list = [40, 50, 60, 70, 80, 90, 100]
@@ -58,6 +66,41 @@ other_data_100 = ['MuscleSkeletalLim','PeakRR', 'PeakVE','PeakVCO2','MeanVCO2','
                   'LowestVE/VCO2','MeanRER','PeakRER','VO2vsPeakVO2atVT','DiffPercentPeakVO2','MeanRR',
                   '75_to_100_VEVCO2Slope','DiffPeakVO2','MeanVE','second_half_VESlope','first_half_VEVCO2Slope',
                   '0_to_25_O2Slope','VO2atVT', 'MeanVO2','second_half_VCO2Slope','DiffPeakHR','MeanVE/VCO2','75_to_100_RRSlope']
+
+
+def get_interpretation_images_by_id(session_id):
+    try:
+        data_df= pd.read_csv('.\\data\\data_100.csv')
+        session_id = float(session_id)
+        image_list_str = []
+        lim_types = ['cardiac', 'pulmonary', 'other']
+        selected_model = None
+        feature_selector = None
+        for lim_type in lim_types:
+            if lim_type == 'cardiac':
+                selected_model = pickle.load(
+                    open('.\\models\\cardiac\\clf_cardiac_100.sav', 'rb'))
+                feature_selector = cardiac_data_100[1:]
+            elif lim_type == 'pulmonary':
+                selected_model = pickle.load(
+                    open('.\\models\\pulmonary\\clf_pulmonary_100.sav', 'rb'))
+                feature_selector = pulmonary_data_100[1:]
+            else:
+                selected_model = pickle.load(
+                    open('.\\models\\other\\clf_other_100.sav', 'rb'))
+                feature_selector = other_data_100[1:]
+            explainer = shap.TreeExplainer(selected_model, data=data_df[feature_selector])
+            shap_values = explainer.shap_values(data_df[feature_selector])
+            data_index = data_df.loc[data_df['SessionId'] == session_id].index[0]
+            pl_result = summary_with_highlight(shap_values[1], data_df[feature_selector], row_highlight=data_index, max_display=10, as_string=True)
+            image_list_str.append(pl_result)
+        print(len(image_list_str))
+        result = CPETInterpretationImages(image_list_str[0],image_list_str[1],image_list_str[2])
+        return result, 200
+    except Exception as e:
+        print(e)
+        return "Unexpected error", 400
+    pass
 
 def get_cardiac_cpet_intepretation_by_id(session_id, lim_type):
     try:
