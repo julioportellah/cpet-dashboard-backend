@@ -75,6 +75,74 @@ other_data_100 = ['MuscleSkeletalLim','PeakRR', 'PeakVE','PeakVCO2','MeanVCO2','
                   '75_to_100_VEVCO2Slope','DiffPeakVO2','MeanVE','second_half_VESlope','first_half_VEVCO2Slope',
                   '0_to_25_O2Slope','VO2atVT', 'MeanVO2','second_half_VCO2Slope','DiffPeakHR','MeanVE/VCO2','75_to_100_RRSlope']
 
+cardiac_feature_dict = {
+  "DiffPercentPeakVO2": "Actual/Expected Peak VO2",
+  "DiffPeakVO2": "Actual - Expected Peak VO2",
+  "75_to_100_VO2Slope": "Session's last quarter VO2 slope",
+  "75_to_100_HRSlope": "Session's last quarter HR slope",
+  "MinO2Pulse": "Minimum O2 pulse",
+  "PeakVE": "Max minute ventilation",
+  "VO2vsPeakVO2atVT": "VO2 at ventilatory threshold vs expected VO2",
+  "second_half_RRSlope": "Second half Respiratory Rate slope",
+  "second_half_VO2Slope": "Second half VO2 slope",
+  "75_to_100_VCO2Slope": "Last quarter VCO2 slope",
+  "MeanVE": "Mean minute ventilation",
+  "second_half_VESlope": "Second half VE slope",
+  "O2PulseDiff": "Actual - Expected maximum O2 pulse",
+  "50_to_75_O2Slope": "Third quarter O2 pulse",
+  "O2PulsePercent": "Actual/Expected maximum O2 pulse",
+  "75_to_100_RERSlope": "Last quarter RER slope",
+  "PeakRER": "Max RER",
+  "50_to_75_VO2Slope": "Last quarter VO2 slope",
+  "PeakVO2Real": "Max VO2"
+}
+
+pulmonary_feature_dict = {
+  "O2PulsePercent": "Actual/Expected maximum O2 pulse",
+  "O2PulseDiff": "Actual - Expected maximum O2 pulse",
+  "first_half_VO2Slope": "First half VO2 slope",
+  "LowestVE/VCO2": "Minimum VE/VCO2",
+  "first_half_VCO2Slope": "First half VCO2 slope",
+  "15_to_85_RRSlope": "15 to 85 session's percent of RR slope",
+  "PeakRR": "Max RR",
+  "50_to_75_RRSlope": "Third quarter RR slope",
+  "MeanO2Pulse": "Mean O2 pulse",
+  "VEvsVCO2Slope": "VE/VCO2 slope",
+  "25_to_50_VCO2Slope": "Second quarter VCO2 slope",
+  "StdHeartRate": "Heart rate's signal standard deviation"
+}
+
+other_feature_dict = {
+  "PeakRR": "Max RR",
+  "PeakVE": "Max minute ventilation",
+  "PeakVCO2": "Max VCO2",
+  "MeanVCO2": "Mean VCO2",
+  "PeakVO2": "Max VO2",
+  "PeakVO2Real": "Max VO2",
+  "LowestVE/VCO2": "Minimum VE/VCO2",
+  "MeanVCO2": "Mean VCO2",
+  "O2PulsePercent": "Actual/Expected maximum O2 pulse",
+  "O2PulseDiff": "Actual - Expected maximum O2 pulse",
+  "first_half_VO2Slope": "First half VO2 slope",
+  "LowestVE/VCO2": "Minimum VE/VCO2",
+  "MeanRER": "Mean RER",
+  "PeakRER": "Max RER",
+  "VO2vsPeakVO2atVT": "VO2 at ventilatory threshold vs expected VO2",
+  "DiffPercentPeakVO2": "Actual/Expected Peak VO2",
+  "MeanRR": "Mean RR",
+  "75_to_100_VEVCO2Slope": "Last quarter VE/VCO2 slope",
+  "DiffPeakVO2": "Actual - Expected Peak VO2",
+  "MeanVE": "Mean minute ventilation",
+  "second_half_VESlope": "Second half VE slope",
+  "first_half_VEVCO2Slope": "First half VE/VCO2 slope",
+  "0_to_25_O2Slope": "First quarter O2 pulse slope",
+  "VO2atVT": "VO2 at the moment of the ventilatory threshold",
+  "MeanVO2": "Mean VO2",
+  "second_half_VCO2Slope": "Second half VCO2 slope",
+  "DiffPeakHR": "Actual-Expected peak heart rate",
+  "MeanVE/VCO2": "Mean VE/VCO2 value",
+  "75_to_100_RRSlope": "Last quarter RR slope"
+}
 
 def get_interpretation_images_by_id(session_id):
     try:
@@ -267,25 +335,21 @@ def get_cpet_record_by_session_id(session_id):
         session_id = float(session_id)
         data_df = pd.read_csv('.\\data\\cpet_full_proba.csv')
         data_filtered = data_df.loc[data_df.SessionId == session_id]
-        #print(data_filtered.SessionId.values[0])
         result = PatientFullPrediction(data_filtered.SessionId.values[0], data_filtered.PatientId.values[0], 
                                 data_filtered.CardiacLimProba.values[0], data_filtered.CardiacLim.values[0],
                                 data_filtered.PulmonaryProba.values[0], data_filtered.PulmonaryLim.values[0],
                                 data_filtered.OtherProba.values[0], data_filtered.OtherLim.values[0])
-        #print(result.cardiac_proba)
-        #res, code = hr.get_record_by_patient_id(patient_id)
         return result, 200
     except Exception as e:
-        #logging.error(traceback.format_exc())
         print(e)
         return "Unexpected error", 400
     pass
 
 
 if __name__ == "__main__":
-    create_force_plot_string('cardiac', 7)
-    _test_force_plot()
-    #_save_tree_explainer_and_shaps()
-    #sget_cardiac_cpet_intepretation_by_id("7", "cardiac")
+    result = [cardiac_feature_dict[elem] for elem in cardiac_data_100[1:]]
+    print(result)
+    #create_force_plot_string('cardiac', 7)
+    #_test_force_plot()
     pass
 

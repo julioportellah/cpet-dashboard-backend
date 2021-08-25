@@ -27,7 +27,7 @@ labels = {
 
 
 def summary_with_highlight(shap_values, features=None, max_display=None, row_highlight=None, sort=True, plot_size="auto",
-                           axis_color="#333333", plot_type='dot', alpha=1, cmap=colors.red_blue, alt_cmap=colors.red_blue,
+                           axis_color="#333333", plot_type='dot', alpha=1, cmap=pl.get_cmap('viridis'), alt_cmap=colors.red_blue,
                            show=True, class_inds=None, color_bar_label=labels["FEATURE_VALUE"], color_bar=True, as_string=False):
     color = colors.blue_rgb
 
@@ -136,10 +136,14 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
                            zorder=3, rasterized=len(shaps) > 500)
 
                 if row_highlight is not None:
-                    col_green = np.array(["yellow"])
+                    dot_color = None
+                    if shap_values[row_highlight][i]>=0:
+                        dot_color = np.array(["red"])
+                    else:
+                        dot_color = np.array(["blue"])
                     pl.scatter(shap_values[row_highlight][i], pos,#yyy[-1],
                            cmap=None, vmin=vmin, vmax=vmax, s=128,
-                           c=col_green, 
+                           c=dot_color, 
                            alpha=alpha, linewidth=0,
                            zorder=3, rasterized=len(shaps) > 500)
             else:

@@ -30,8 +30,6 @@ def get_cardiac_cpet_intepretation_by_id(session_id):
         #res, code = hr.get_record_by_patient_id(patient_id)
         return json.dumps(vars(shap_custom_result[0])), 200
     except Exception as e:
-        print(e)
-        #logging.error(traceback.format_exc())
         return "Unexpected error", 400
     pass
 
@@ -53,13 +51,10 @@ def get_dynamic_cpet_by_session_id(session_id):
         str, int: Error Message, 400
     """
     try:
-        print(session_id)
         result = cps.get_dynamic_cpet_record_by_session_id(session_id)
         #res, code = hr.get_record_by_patient_id(patient_id)
         return json.dumps(vars(result[0])), 200
     except Exception as e:
-        #logging.error(traceback.format_exc())
-        print(e)
         return "Unexpected error", 400
     pass
 
@@ -81,11 +76,8 @@ def get_cpet_record_by_session_id(session_id):
     """
     try:
         result = cps.get_cpet_record_by_session_id(session_id)
-        #res, code = hr.get_record_by_patient_id(patient_id)
         return json.dumps(vars(result[0])), 200
     except Exception as e:
-        #logging.error(traceback.format_exc())
-        print(e)
         return "Unexpected error", 400
 
 if __name__ == "__main__":
