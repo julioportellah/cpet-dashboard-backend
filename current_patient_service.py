@@ -74,7 +74,6 @@ other_data_100 = ['MuscleSkeletalLim','PeakRR', 'PeakVE','PeakVCO2','MeanVCO2','
                   'LowestVE/VCO2','MeanRER','PeakRER','VO2vsPeakVO2atVT','DiffPercentPeakVO2','MeanRR',
                   '75_to_100_VEVCO2Slope','DiffPeakVO2','MeanVE','second_half_VESlope','first_half_VEVCO2Slope',
                   '0_to_25_O2Slope','VO2atVT', 'MeanVO2','second_half_VCO2Slope','DiffPeakHR','MeanVE/VCO2','75_to_100_RRSlope']
-
 cardiac_feature_dict = {
   "DiffPercentPeakVO2": "Actual/Expected Peak VO2",
   "DiffPeakVO2": "Actual - Expected Peak VO2",
@@ -152,17 +151,25 @@ def get_interpretation_images_by_id(session_id):
         lim_types = ['cardiac', 'pulmonary', 'other']
         selected_model = None
         feature_selector = None
+        df_data_renamed = None
         for lim_type in lim_types:
             if lim_type == 'cardiac':
                 feature_selector = cardiac_data_100[1:]
+                df_data_renamed = data_df[feature_selector]
+                df_data_renamed.columns = df_data_renamed.columns.to_series().map(cardiac_feature_dict)
             elif lim_type == 'pulmonary':
                 feature_selector = pulmonary_data_100[1:]
+                df_data_renamed = data_df[feature_selector]
+                df_data_renamed.columns = df_data_renamed.columns.to_series().map(pulmonary_feature_dict)
             else:
                 feature_selector = other_data_100[1:]
+                df_data_renamed = data_df[feature_selector]
+                df_data_renamed.columns = df_data_renamed.columns.to_series().map(other_feature_dict)
             shap_values = pickle.load(
                     open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
             data_index = data_df.loc[data_df['SessionId'] == session_id].index[0]
-            pl_result = summary_with_highlight(shap_values[1], data_df[feature_selector], row_highlight=data_index, max_display=10, as_string=True)
+            #pl_result = summary_with_highlight(shap_values[1], data_df[feature_selector], row_highlight=data_index, max_display=10, as_string=True)
+            pl_result = summary_with_highlight(shap_values[1], df_data_renamed, row_highlight=data_index, max_display=10, as_string=True)
             image_list_str.append(pl_result)
             force_pl_str = create_force_plot_string(lim_type, data_index)
             image_list_str.append(force_pl_str)
@@ -180,15 +187,19 @@ def create_force_plot_string(lim_type, data_index):
     file_name_png = file_name + '.png'
     file_name_jpg = file_name + '.jpg'
     feature_selector = None
+    renamed_feature_selector = None
     if lim_type == 'cardiac':
         feature_selector = cardiac_data_100[1:]
+        renamed_feature_selector = [cardiac_feature_dict[elem] for elem in feature_selector]
     elif lim_type == 'pulmonary':
         feature_selector = pulmonary_data_100[1:]
+        renamed_feature_selector = [pulmonary_feature_dict[elem] for elem in feature_selector]
     else:
         feature_selector = other_data_100[1:]
+        renamed_feature_selector = [other_feature_dict[elem] for elem in feature_selector]
     loaded_tree = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
     shap_values = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
-    shap.force_plot(loaded_tree.expected_value[1], shap_values[1][data_index], feature_names=feature_selector,
+    shap.force_plot(loaded_tree.expected_value[1], shap_values[1][data_index], feature_names=renamed_feature_selector,
             link='identity', contribution_threshold=0.1,show=False, plot_cmap=['#77dd77', '#f99191'],
             matplotlib=True).savefig('.\\temp_images\\'+file_name_png,format = "png",dpi = 150,bbox_inches = 'tight')
     png_img = img.open('.\\temp_images\\'+file_name_png)
