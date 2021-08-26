@@ -223,16 +223,6 @@ def _test_force_plot():
     shap.force_plot(loaded_tree.expected_value[1], shap_values[-1][0], feature_names=cardiac_data_100[1:],
             link='identity', contribution_threshold=0.1,show=False, plot_cmap=['#77dd77', '#f99191'],
             matplotlib=True).savefig('.\\temp_images\\'+'scratch.png',format = "png",dpi = 150,bbox_inches = 'tight')
-    # shap.force_plot(loaded_tree.expected_value[1], shap_values[1][0],  feature_names=cardiac_data_100[1:],
-    #                 contribution_threshold=0.9, link='identity', matplotlib=True, show=False)
-    # plt.savefig('.\\temp_images\\'+'scratch2.png')
-    #pl.savefig('.\\temp_images\\'+'scratch.png')
-    #plt.show()
-    # pl.tight_layout()
-    #pl.savefig('.\\temp_images\\'+file_name_png,dpi=pl.gcf().dpi)
-    #cardiac_explainer = shap.TreeExplainer(cardiac_loaded_model, data=data_df[cardiac_top_features])
-    #cardiac_shap_values = cardiac_explainer.shap_values(data_df[cardiac_top_features])
-    # shap.force_plot(cardiac_explainer.expected_value[1], cardiac_shap_values[1][-50,:], feature_names=cardiac_top_features,link='identity', contribution_threshold=0.9, matplotlib=False)
     pass
 
 def _save_tree_explainer_and_shaps():
@@ -240,22 +230,31 @@ def _save_tree_explainer_and_shaps():
     image_list_str = []
     lim_types = ['cardiac', 'pulmonary', 'other']
     selected_model = None
+    selected_scaler = None
     feature_selector = None
     for lim_type in lim_types:
         if lim_type == 'cardiac':
             selected_model = pickle.load(
                 open('.\\models\\cardiac\\clf_cardiac_100.sav', 'rb'))
+            selected_scaler = pickle.load(
+                open('.\\models\\cardiac\\scaler_clf_cardiac_100.sav', 'rb'))
             feature_selector = cardiac_data_100[1:]
         elif lim_type == 'pulmonary':
             selected_model = pickle.load(
                 open('.\\models\\pulmonary\\clf_pulmonary_100.sav', 'rb'))
+            selected_scaler = pickle.load(
+                open('.\\models\\pulmonary\\scaler_clf_pulmonary_100.sav', 'rb'))
             feature_selector = pulmonary_data_100[1:]
         else:
             selected_model = pickle.load(
                 open('.\\models\\other\\clf_other_100.sav', 'rb'))
+            selected_scaler = pickle.load(
+                open('.\\models\\other\\scaler_clf_other_100.sav', 'rb'))
             feature_selector = other_data_100[1:]
-        explainer = shap.TreeExplainer(selected_model, data=data_df[feature_selector])
-        shap_values = explainer.shap_values(data_df[feature_selector])
+        selected_scaler.fit(data_df[feature_selector])
+        X_scaled = selected_scaler.transform(data_df[feature_selector])
+        explainer = shap.TreeExplainer(selected_model, data=X_scaled)
+        shap_values = explainer.shap_values(X_scaled)
         print(explainer)
         print(shap_values)
         pickle.dump(explainer, open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav','wb'))
@@ -358,9 +357,10 @@ def get_cpet_record_by_session_id(session_id):
 
 
 if __name__ == "__main__":
-    result = [cardiac_feature_dict[elem] for elem in cardiac_data_100[1:]]
-    print(result)
-    #create_force_plot_string('cardiac', 7)
+    #result = [cardiac_feature_dict[elem] for elem in cardiac_data_100[1:]]
+    #print(result)
+    #_save_tree_explainer_and_shaps()
+    create_force_plot_string('cardiac', 7)
     #_test_force_plot()
     pass
 
