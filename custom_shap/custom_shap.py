@@ -187,6 +187,20 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
         file_name_png = file_name + ".png"
         file_name_jpg = file_name +".jpg"
         pl.tight_layout()
+
+
+
+        #New code
+        import io
+        my_stringIObytes = io.BytesIO()
+        pl.savefig(my_stringIObytes,dpi=pl.gcf().dpi, format='jpg')
+        my_stringIObytes.seek(0)
+        result =  base64.b64encode(my_stringIObytes.getvalue()).decode("utf-8").replace("\n", "")
+        pl.close()
+        #print(result)
+        return str(result)
+
+
         pl.savefig('.\\temp_images\\'+file_name_png,dpi=pl.gcf().dpi)
         #pl.savefig('.\\temp_images\\'+file_name_jpg,dpi=pl.gcf().dpi)
         png_img = img.open('.\\temp_images\\'+file_name_png)

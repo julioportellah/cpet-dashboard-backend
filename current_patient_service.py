@@ -199,6 +199,17 @@ def create_force_plot_string(lim_type, data_index):
         renamed_feature_selector = [other_feature_dict[elem] for elem in feature_selector]
     loaded_tree = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
     shap_values = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
+
+    import io
+    my_stringIObytes = io.BytesIO()
+    shap.force_plot(loaded_tree.expected_value[1], shap_values[1][data_index], feature_names=renamed_feature_selector,
+                    link='identity', contribution_threshold=0.1, show=False, plot_cmap=['#77dd77', '#f99191'],
+                    matplotlib=True).savefig(my_stringIObytes, format="png", dpi=150, bbox_inches='tight')
+    my_stringIObytes.seek(0)
+    my_base64_jpgData = base64.b64encode(my_stringIObytes.getvalue()).decode("utf-8").replace("\n", "")
+    pl.close()
+    return str(my_base64_jpgData)
+
     shap.force_plot(loaded_tree.expected_value[1], shap_values[1][data_index], feature_names=renamed_feature_selector,
             link='identity', contribution_threshold=0.1,show=False, plot_cmap=['#77dd77', '#f99191'],
             matplotlib=True).savefig('.\\temp_images\\'+file_name_png,format = "png",dpi = 150,bbox_inches = 'tight')
