@@ -6,6 +6,7 @@ import io
 import matplotlib.pyplot as pl
 import shap
 import base64
+from custom_shap import summary_with_highlight 
 
 cardiac_data_100 = ['DiffPercentPeakVO2', 'DiffPeakVO2','75_to_100_VO2Slope','75_to_100_HRSlope','MinO2Pulse',
                       'PeakVE','VO2vsPeakVO2atVT','second_half_RRSlope','second_half_VO2Slope','75_to_100_VCO2Slope','MeanVE',
@@ -85,7 +86,8 @@ other_data_40 = ['LowestVE/VCO2','MeanVCO2','first_half_HRSlope','MeanVO2','firs
 class NewPatientDynamicFullPrediction():
     def __init__(self, cardiac_proba_array, pulmonary_proba_array,
                  other_proba_array,cardiac_force=None,pulmonary_force=None,
-                 other_force=None) -> None:
+                 other_force=None, cardiac_summary=None, pulmonary_summary=None,
+                 other_summary=None) -> None:
         self.cardiac_proba = cardiac_proba_array
         self.pulmonary_proba = pulmonary_proba_array
         self.other_proba = other_proba_array
@@ -175,9 +177,9 @@ def process_data(df):
     pulmonary_force_plot = create_force_plot_string('pulmonary',data_100,pulmonary_col_list[-1])
     other_force_plot = create_force_plot_string('other',data_100,other_col_list[-1])
     
-    print(cardiac_force_plot)
     result = NewPatientDynamicFullPrediction(cardiac_dynamic_result, pulmonary_dynamic_result, other_dynamic_result,
-                                            cardiac_force_plot, pulmonary_force_plot, other_force_plot)
+                                            cardiac_force_plot[0], pulmonary_force_plot[0], other_force_plot[0],
+                                            cardiac_force_plot[1], pulmonary_force_plot[1], other_force_plot[1])
     # lim_type = 'cardiac'
     # loaded_tree = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
     # shap_values = loaded_tree.shap_values(data_100[cardiac_col_list[-1]])
@@ -187,7 +189,10 @@ def process_data(df):
 
 def create_force_plot_string(lim_type, df, cols):
     loaded_tree = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
+    loaded_previous_shaps = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
     shap_values = loaded_tree.shap_values(df[cols])
+    loaded_df = pd.read_csv('.\\data\\data_100.csv')
+    loaded_df = loaded_df[cols]
 
     my_stringIObytes = io.BytesIO()
     shap.force_plot(loaded_tree.expected_value[1], shap_values[1][0], feature_names=cols,
@@ -196,7 +201,12 @@ def create_force_plot_string(lim_type, df, cols):
     my_stringIObytes.seek(0)
     my_base64_jpgData = base64.b64encode(my_stringIObytes.getvalue()).decode("utf-8").replace("\n", "")
     pl.close()
-    return str(my_base64_jpgData)
+    ##
+    all_shap_values = np.append(loaded_previous_shaps[1], shap_values[1], axis=0)
+    loaded_df = loaded_df.append(df[cols])
+    pl_result = summary_with_highlight(all_shap_values, loaded_df[cols], row_highlight=-1, max_display=10, as_string=True)
+    pl.close()
+    return str(my_base64_jpgData), str(pl_result)
 
 
 def _generate_list_predictions(list_dfs, list_cols, list_scalers, list_models):

@@ -134,7 +134,6 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
                            cmap=cmap, vmin=vmin, vmax=vmax, s=16,
                            c=cvals, alpha=alpha, linewidth=0,
                            zorder=3, rasterized=len(shaps) > 500)
-
                 if row_highlight is not None:
                     dot_color = None
                     if shap_values[row_highlight][i]>=0:
