@@ -62,7 +62,6 @@ def _generate_array(df, type_lim):
     for time in time_list:
         result.append(int(df[type_lim+'LimProba_'+str(time)].values[0]*100))
     return result
-    pass
 
 
 cardiac_data_100 = ['CardiacLim','DiffPercentPeakVO2', 'DiffPeakVO2','75_to_100_VO2Slope','75_to_100_HRSlope','MinO2Pulse',

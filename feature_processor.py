@@ -2,6 +2,10 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import pickle
+import io
+import matplotlib.pyplot as pl
+import shap
+import base64
 
 cardiac_data_100 = ['DiffPercentPeakVO2', 'DiffPeakVO2','75_to_100_VO2Slope','75_to_100_HRSlope','MinO2Pulse',
                       'PeakVE','VO2vsPeakVO2atVT','second_half_RRSlope','second_half_VO2Slope','75_to_100_VCO2Slope','MeanVE',
@@ -80,11 +84,15 @@ other_data_40 = ['LowestVE/VCO2','MeanVCO2','first_half_HRSlope','MeanVO2','firs
 
 class NewPatientDynamicFullPrediction():
     def __init__(self, cardiac_proba_array, pulmonary_proba_array,
-                 other_proba_array) -> None:
+                 other_proba_array,cardiac_force=None,pulmonary_force=None,
+                 other_force=None) -> None:
         self.cardiac_proba = cardiac_proba_array
         self.pulmonary_proba = pulmonary_proba_array
         self.other_proba = other_proba_array
         self.time_list = [40, 50, 60, 70, 80, 90, 100]
+        self.cardiac_force = cardiac_force
+        self.pulmonary_force = pulmonary_force
+        self.other_force = other_force
         pass
     pass
 
@@ -161,10 +169,35 @@ def process_data(df):
     other_scaler_list = _generate_list_loaded_scaler('other')
     other_model_list = _generate_list_loaded_models('other')
     other_dynamic_result = _generate_list_predictions(result_datasets, other_col_list, other_scaler_list, other_model_list)
-    result = NewPatientDynamicFullPrediction(cardiac_dynamic_result, pulmonary_dynamic_result, other_dynamic_result)
     time_list = [40, 50, 60, 70, 80, 90, 100]
+    #Adding the force plot
+    cardiac_force_plot = create_force_plot_string('cardiac',data_100,cardiac_col_list[-1])
+    pulmonary_force_plot = create_force_plot_string('pulmonary',data_100,pulmonary_col_list[-1])
+    other_force_plot = create_force_plot_string('other',data_100,other_col_list[-1])
+    
+    print(cardiac_force_plot)
+    result = NewPatientDynamicFullPrediction(cardiac_dynamic_result, pulmonary_dynamic_result, other_dynamic_result,
+                                            cardiac_force_plot, pulmonary_force_plot, other_force_plot)
+    # lim_type = 'cardiac'
+    # loaded_tree = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
+    # shap_values = loaded_tree.shap_values(data_100[cardiac_col_list[-1]])
+    # print(shap_values[1])
     return result
     pass
+
+def create_force_plot_string(lim_type, df, cols):
+    loaded_tree = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
+    shap_values = loaded_tree.shap_values(df[cols])
+
+    my_stringIObytes = io.BytesIO()
+    shap.force_plot(loaded_tree.expected_value[1], shap_values[1][0], feature_names=cols,
+                    link='identity', contribution_threshold=0.1, show=False, plot_cmap=['#77dd77', '#f99191'],
+                    matplotlib=True).savefig(my_stringIObytes, format="png", dpi=150, bbox_inches='tight')
+    my_stringIObytes.seek(0)
+    my_base64_jpgData = base64.b64encode(my_stringIObytes.getvalue()).decode("utf-8").replace("\n", "")
+    pl.close()
+    return str(my_base64_jpgData)
+
 
 def _generate_list_predictions(list_dfs, list_cols, list_scalers, list_models):
     result = []
