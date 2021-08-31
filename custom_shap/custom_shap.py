@@ -197,6 +197,7 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
         my_stringIObytes.seek(0)
         result =  base64.b64encode(my_stringIObytes.getvalue()).decode("utf-8").replace("\n", "")
         pl.close()
+        pl.close()
         #print(result)
         return str(result)
 

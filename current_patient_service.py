@@ -9,8 +9,10 @@ import base64
 import os
 from PIL import Image as img
 from matplotlib import pyplot as plt
-import matplotlib.pyplot as pl; 
-
+import matplotlib.pyplot as pl
+import base64 as b64
+import io
+from feature_processor import process_data
 
 class PatientFullPrediction():
     def __init__(self, session_id, patient_id, cardiac_proba, cardiac_lim, pulmonary_proba,
@@ -143,6 +145,27 @@ other_feature_dict = {
   "75_to_100_RRSlope": "Last quarter RR slope"
 }
 
+
+def analyze_patient_data(input_data):
+    try:
+        decrypted = base64.b64decode(input_data['Upload']).decode('utf-8')
+        test_pd = None
+        with io.StringIO(decrypted) as fp:
+            test_pd = pd.read_csv(fp)
+        test_pd['sex']=input_data['Sex']
+        test_pd['age']=input_data['Age']
+        test_pd['height-cm']=input_data['Height']
+        test_pd['weight-kg']=input_data['Weight']
+        result = process_data(test_pd)
+        return result, 200
+        # Once the data is read
+        pass
+    except Exception as e:
+        print(e)
+        return "Unexpected error", 400
+        pass
+    
+
 def get_interpretation_images_by_id(session_id):
     try:
         data_df= pd.read_csv('.\\data\\data_100.csv')
@@ -169,6 +192,7 @@ def get_interpretation_images_by_id(session_id):
                     open(f".\\models\\{lim_type}\\"+lim_type+'_shap_values.sav', 'rb'))
             data_index = data_df.loc[data_df['SessionId'] == session_id].index[0]
             #pl_result = summary_with_highlight(shap_values[1], data_df[feature_selector], row_highlight=data_index, max_display=10, as_string=True)
+            plt.close()
             pl_result = summary_with_highlight(shap_values[1], df_data_renamed, row_highlight=data_index, max_display=10, as_string=True)
             image_list_str.append(pl_result)
             force_pl_str = create_force_plot_string(lim_type, data_index)

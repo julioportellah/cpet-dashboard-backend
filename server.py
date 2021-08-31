@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, Request
+from flask import Flask, jsonify,  request
 from flask_cors import CORS
 import os
 import current_patient_service as cps
@@ -6,6 +6,16 @@ import json
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route("/api/analyze_patient_data/", methods =["POST"])
+def analyze_patient_data():
+    try:
+        in_data = request.get_json()
+        results = cps.analyze_patient_data(in_data)
+        return json.dumps(vars(results[0])),200
+    except Exception as e:
+        return "Unexpected error", 400
 
 
 @app.route("/api/get_shap_interpretation_by_session_id/<session_id>",
