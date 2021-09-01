@@ -82,10 +82,79 @@ other_data_40 = ['LowestVE/VCO2','MeanVCO2','first_half_HRSlope','MeanVO2','firs
                 'PeakVCO2','O2PulseDiff','MeanVE/VCO2','O2PulsePercent','PeakVO2','first_half_O2Slope',
                 'second_half_VCO2Slope','PeakVE','MeanO2Pulse']
 
+cardiac_feature_dict = {
+  "DiffPercentPeakVO2": "Actual/Expected Peak VO2",
+  "DiffPeakVO2": "Actual - Expected Peak VO2",
+  "75_to_100_VO2Slope": "Session's last quarter VO2 slope",
+  "75_to_100_HRSlope": "Session's last quarter HR slope",
+  "MinO2Pulse": "Minimum O2 pulse",
+  "PeakVE": "Max minute ventilation",
+  "VO2vsPeakVO2atVT": "VO2 at ventilatory threshold vs expected VO2",
+  "second_half_RRSlope": "Second half Respiratory Rate slope",
+  "second_half_VO2Slope": "Second half VO2 slope",
+  "75_to_100_VCO2Slope": "Last quarter VCO2 slope",
+  "MeanVE": "Mean minute ventilation",
+  "second_half_VESlope": "Second half VE slope",
+  "O2PulseDiff": "Actual - Expected maximum O2 pulse",
+  "50_to_75_O2Slope": "Third quarter O2 pulse",
+  "O2PulsePercent": "Actual/Expected maximum O2 pulse",
+  "75_to_100_RERSlope": "Last quarter RER slope",
+  "PeakRER": "Max RER",
+  "50_to_75_VO2Slope": "Last quarter VO2 slope",
+  "PeakVO2Real": "Max VO2"
+}
+
+pulmonary_feature_dict = {
+  "O2PulsePercent": "Actual/Expected maximum O2 pulse",
+  "O2PulseDiff": "Actual - Expected maximum O2 pulse",
+  "first_half_VO2Slope": "First half VO2 slope",
+  "LowestVE/VCO2": "Minimum VE/VCO2",
+  "first_half_VCO2Slope": "First half VCO2 slope",
+  "15_to_85_RRSlope": "15 to 85 session's percent of RR slope",
+  "PeakRR": "Max RR",
+  "50_to_75_RRSlope": "Third quarter RR slope",
+  "MeanO2Pulse": "Mean O2 pulse",
+  "VEvsVCO2Slope": "VE/VCO2 slope",
+  "25_to_50_VCO2Slope": "Second quarter VCO2 slope",
+  "StdHeartRate": "Heart rate's signal standard deviation"
+}
+
+other_feature_dict = {
+  "PeakRR": "Max RR",
+  "PeakVE": "Max minute ventilation",
+  "PeakVCO2": "Max VCO2",
+  "MeanVCO2": "Mean VCO2",
+  "PeakVO2": "Max VO2",
+  "PeakVO2Real": "Max VO2",
+  "LowestVE/VCO2": "Minimum VE/VCO2",
+  "MeanVCO2": "Mean VCO2",
+  "O2PulsePercent": "Actual/Expected maximum O2 pulse",
+  "O2PulseDiff": "Actual - Expected maximum O2 pulse",
+  "first_half_VO2Slope": "First half VO2 slope",
+  "LowestVE/VCO2": "Minimum VE/VCO2",
+  "MeanRER": "Mean RER",
+  "PeakRER": "Max RER",
+  "VO2vsPeakVO2atVT": "VO2 at ventilatory threshold vs expected VO2",
+  "DiffPercentPeakVO2": "Actual/Expected Peak VO2",
+  "MeanRR": "Mean RR",
+  "75_to_100_VEVCO2Slope": "Last quarter VE/VCO2 slope",
+  "DiffPeakVO2": "Actual - Expected Peak VO2",
+  "MeanVE": "Mean minute ventilation",
+  "second_half_VESlope": "Second half VE slope",
+  "first_half_VEVCO2Slope": "First half VE/VCO2 slope",
+  "0_to_25_O2Slope": "First quarter O2 pulse slope",
+  "VO2atVT": "VO2 at the moment of the ventilatory threshold",
+  "MeanVO2": "Mean VO2",
+  "second_half_VCO2Slope": "Second half VCO2 slope",
+  "DiffPeakHR": "Actual-Expected peak heart rate",
+  "MeanVE/VCO2": "Mean VE/VCO2 value",
+  "75_to_100_RRSlope": "Last quarter RR slope"
+}
+
 
 class NewPatientDynamicFullPrediction():
     def __init__(self, cardiac_proba_array, pulmonary_proba_array,
-                 other_proba_array,cardiac_force=None,pulmonary_force=None,
+                 other_proba_array, cardiac_force=None, pulmonary_force=None,
                  other_force=None, cardiac_summary=None, pulmonary_summary=None,
                  other_summary=None) -> None:
         self.cardiac_proba = cardiac_proba_array
@@ -95,6 +164,9 @@ class NewPatientDynamicFullPrediction():
         self.cardiac_force = cardiac_force
         self.pulmonary_force = pulmonary_force
         self.other_force = other_force
+        self.cardiac_summary = cardiac_summary
+        self.pulmonary_summary = pulmonary_summary
+        self.other_summary = other_summary
         pass
     pass
 
@@ -180,10 +252,6 @@ def process_data(df):
     result = NewPatientDynamicFullPrediction(cardiac_dynamic_result, pulmonary_dynamic_result, other_dynamic_result,
                                             cardiac_force_plot[0], pulmonary_force_plot[0], other_force_plot[0],
                                             cardiac_force_plot[1], pulmonary_force_plot[1], other_force_plot[1])
-    # lim_type = 'cardiac'
-    # loaded_tree = pickle.load(open(f".\\models\\{lim_type}\\"+lim_type+'_tree_explainer.sav', 'rb'))
-    # shap_values = loaded_tree.shap_values(data_100[cardiac_col_list[-1]])
-    # print(shap_values[1])
     return result
     pass
 
@@ -193,9 +261,16 @@ def create_force_plot_string(lim_type, df, cols):
     shap_values = loaded_tree.shap_values(df[cols])
     loaded_df = pd.read_csv('.\\data\\data_100.csv')
     loaded_df = loaded_df[cols]
-
+    col_translated=None
+    if lim_type == 'cardiac':
+        col_translated = [cardiac_feature_dict[elem] for elem in cols]
+    elif lim_type == 'pulmonary':
+        col_translated = [pulmonary_feature_dict[elem] for elem in cols]
+    else:
+        col_translated = [other_feature_dict[elem] for elem in cols]
+    
     my_stringIObytes = io.BytesIO()
-    shap.force_plot(loaded_tree.expected_value[1], shap_values[1][0], feature_names=cols,
+    shap.force_plot(loaded_tree.expected_value[1], shap_values[1][0], feature_names=col_translated,#cols,
                     link='identity', contribution_threshold=0.1, show=False, plot_cmap=['#77dd77', '#f99191'],
                     matplotlib=True).savefig(my_stringIObytes, format="png", dpi=150, bbox_inches='tight')
     my_stringIObytes.seek(0)
@@ -204,7 +279,16 @@ def create_force_plot_string(lim_type, df, cols):
     ##
     all_shap_values = np.append(loaded_previous_shaps[1], shap_values[1], axis=0)
     loaded_df = loaded_df.append(df[cols])
-    pl_result = summary_with_highlight(all_shap_values, loaded_df[cols], row_highlight=-1, max_display=10, as_string=True)
+    loaded_df.columns = loaded_df.columns.str.replace(' ', '')
+    loaded_df.columns = loaded_df.columns.str.replace('\n', '')
+    if lim_type == 'cardiac':
+        loaded_df.columns = loaded_df.columns.to_series().map(cardiac_feature_dict)
+    elif lim_type == 'pulmonary':
+        loaded_df.columns = loaded_df.columns.to_series().map(pulmonary_feature_dict)
+    else:
+        loaded_df.columns = loaded_df.columns.to_series().map(other_feature_dict)
+    pl_result = summary_with_highlight(all_shap_values, loaded_df, row_highlight=-1, max_display=10, as_string=True)
+    #pl_result = summary_with_highlight(all_shap_values, loaded_df[cols], row_highlight=-1, max_display=10, as_string=True)
     pl.close()
     return str(my_base64_jpgData), str(pl_result)
 
