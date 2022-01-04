@@ -1,0 +1,226 @@
+PatientId,Source,MainSource
+7,CHF.1.xlsx,Duke
+8,CHF.2.xlsx,Duke
+9,DEAS.1.xlsx,Duke
+10,DEAS.2.xlsx,Duke
+11,DEAS.3.xlsx,Duke
+12,DEAS.4.xlsx,Duke
+13,EB.1.xlsx,Duke
+14,ELDER.1.xlsx,Duke
+15,PAD.1.xlsx,Duke
+16,RA.1.xlsx,Duke
+17,SMF.1.xlsx,Duke
+18,SMF.2.xlsx,Duke
+19,STR.1.xlsx,Duke
+20,STR.2.xlsx,Duke
+21,STR.3.xlsx,Duke
+22,STR.4.xlsx,Duke
+23,STR PD-061.xlsx,Duke
+24,STR PD-079.xlsx,Duke
+25,STR PD-081.xlsx,Duke
+26,STR PD-103.xlsx,Duke
+27,STR PD-113.xlsx,Duke
+28,STR PD-115.xlsx,Duke
+29,STR PD-124.xlsx,Duke
+30,STR PD-143.xlsx,Duke
+31,STR PD-170.xlsx,Duke
+32,STR PD-182.xlsx,Duke
+33,STR PD-191.xlsx,Duke
+34,STR PD-192.xlsx,Duke
+35,STR PD-208.xlsx,Duke
+36,STR PD-213.xlsx,Duke
+37,STR PD-218.xlsx,Duke
+38,STR PD-221.xlsx,Duke
+39,STR PD-233.xlsx,Duke
+40,STR PD-234.xlsx,Duke
+41,STR PD-250.xlsx,Duke
+42,Subject01_BxB.xslx,UVA
+43,Subject02_BxB.xslx,UVA
+44,Subject03_BxB.xslx,UVA
+45,Subject04_BxB.xslx,UVA
+46,Subject05_BxB.xslx,UVA
+47,Subject06_BxB.xslx,UVA
+48,Subject07_BxB.xslx,UVA
+49,Subject08_BxB.xslx,UVA
+50,Subject09_BxB.xslx,UVA
+51,Subject10_BxB.xslx,UVA
+52,Subject11_BxB.xslx,UVA
+53,Subject12_BxB.xslx,UVA
+54,Subject13_BxB.xslx,UVA
+55,Subject14_BxB.xslx,UVA
+56,Subject15_BxB.xslx,UVA
+57,Subject16_BxB.xslx,UVA
+58,Subject17_BxB.xslx,UVA
+59,Subject18_BxB.xslx,UVA
+60,Subject19_BxB.xslx,UVA
+61,Subject20_BxB.xslx,UVA
+62,Subject21_BxB.xslx,UVA
+63,Subject22_BxB.xslx,UVA
+64,Subject23_BxB.xslx,UVA
+65,Subject24_BxB.xslx,UVA
+66,Subject25_BxB.xslx,UVA
+67,Subject26_BxB.xslx,UVA
+68,Subject27_BxB.xslx,UVA
+69,Subject28_BxB.xslx,UVA
+70,Subject29_BxB.xslx,UVA
+71,Subject30_BxB.xslx,UVA
+72,Book_Case1_239,Book
+73,Book_Case2_242,Book
+74,Book_Case3_245,Book
+75,Book_Case4_249,Book
+76,Book_Case5_252,Book
+77,Book_Case6_255,Book
+78,Book_Case7_260,Book
+79,Book_Case8_263,Book
+80,Book_Case9_271,Book
+81,Book_Case10_276,Book
+82,Book_Case11_279,Book
+83,Book_Case11_279,Book
+84,Book_Case12_285,Book
+85,Book_Case13_288_1,Book
+86,Book_Case14_293,Book
+87,Book_Case15_297,Book
+88,Book_Case16_300,Book
+89,Book_Case17_303,Book
+90,Book_Case18_306,Book
+91,Book_Case19_309_1,Book
+92,Book_Case19_309_2,Book
+93,Book_Case20_314,Book
+94,Book_Case21_319,Book
+95,Book_Case22_322,Book
+96,Book_Case23_325_1,Book
+97,Book_Case23_325_2,Book
+98,Book_Case24_330,Book
+99,Book_Case25_333,Book
+100,Book_Case26_336,Book
+101,Book_Case27_339,Book
+102,Book_Case28_342,Book
+103,Book_Case29_345,Book
+104,Book_Case30_348,Book
+105,Book_Case31_352,Book
+106,Book_Case32_355,Book
+107,Book_Case33_358,Book
+108,Book_Case34_362,Book
+109,Book_Case35_367,Book
+110,Book_Case36_372,Book
+111,Book_Case37_378_1,Book
+112,Book_Case37_378_2,Book
+113,Book_Case38_384,Book
+114,Book_Case39_387,Book
+115,Book_Case40_391,Book
+116,Book_Case41_397,Book
+117,Book_Case42_400,Book
+118,Book_Case43_405,Book
+119,Book_Case44_408,Book
+120,Book_Case45_412,Book
+121,Book_Case46_415,Book
+122,Book_Case47_418,Book
+123,Book_Case48_421,Book
+124,Book_Case49_424,Book
+125,Book_Case50_429_1,Book
+126,Book_Case51_434_1,Book
+127,Book_Case52_438,Book
+128,Book_Case53_442,Book
+129,Book_Case54_445,Book
+130,Book_Case55_448,Book
+131,Book_Case56_451,Book
+132,Book_Case57_454,Book
+133,Book_Case58_457,Book
+134,Book_Case59_463,Book
+135,Book_Case60_469,Book
+136,Book_Case61_473,Book
+137,Book_Case62_476,Book
+138,Book_Case63_479,Book
+139,Book_Case64_483,Book
+140,Book_Case65_486,Book
+141,Book_Case66_489,Book
+142,Book_Case67_492,Book
+143,Book_Case68_495,Book
+144,Book_Case69_498,Book
+145,Book_Case70_501,Book
+146,Book_Case71_505,Book
+147,Book_Case72_509,Book
+148,Book_Case73_512,Book
+149,Book_Case74_517,Book
+150,Book_Case75_521,Book
+151,Book_Case76_524,Book
+152,Book_Case77_527,Book
+153,Book_Case78_533,Book
+154,Book_Case79_536,Book
+155,Book_Case80_539,Book
+156,Book_Case81_542,Book
+157,Book_Case82_548,Book
+158,Book_Case83_551,Book
+159,Book_Case84_554,Book
+160,Book_Case85_557,Book
+161,Book_Case86_560,Book
+162,Book_Case87_565,Book
+163,Book_Case88_571,Book
+164,Book_Case89_577,Book
+165,Book_Case90_580,Book
+166,Book_Case91_584,Book
+167,Book_Case92_588,Book
+168,Book_Case93_591,Book
+169,Book_Case94_597,Book
+170,Book_Case95_603,Book
+171,Book_Case96_609,Book
+172,Book_Case97_612,Book
+173,Book_Case98_615,Book
+174,Book_Case99_619,Book
+175,Book_Case100_622,Book
+176,Book_Case101_625,Book
+177,Book_Case102_628,Book
+178,Book_Case103_631,Book
+179,Book_Case104_637,Book
+180,Book_Case105_640,Book
+181,Book_Case106_643,Book
+182,Book_Case107_646,Book
+183,Book_Case108_649,Book
+184,Book_Case108_649,Book
+185,Book_Case109_654,Book
+186,Book_Case110_657,Book
+187,STR PD-019.xlsx,UVA
+188,STR PD-044.xlsx,UVA
+189,STR PD-059.xlsx,UVA
+190,STR PD-065.xlsx,UVA
+191,STR PD-114.xlsx,UVA
+192,STR S1-208.xlsx,UVA
+193,STR S1-215.xlsx,UVA
+194,STR S1-216.xlsx,UVA
+195,STR S1-240.xlsx,UVA
+196,STR S1-242.xlsx,UVA
+197,STR S1-246.xlsx,UVA
+198,STR S1-247.xlsx,UVA
+199,STR S1-254.xlsx,UVA
+200,STR S1-265.xlsx,UVA
+201,STR S1-268.xlsx,UVA
+202,STR S1-269.xlsx,UVA
+203,STR S1-271.xlsx,UVA
+204,STR S1-274.xlsx,UVA
+205,STR S1-275.xlsx,UVA
+206,STR S1-276.xlsx,UVA
+207,STR S1-280.xlsx,UVA
+208,STR S1-281.xlsx,UVA
+209,STR S1-282.xlsx,UVA
+210,STR S2-301.xlsx,UVA
+211,STR S2-309.xlsx,UVA
+212,CPX PAD1.xls,UVA
+213,CPX PAD2.xls,UVA
+214,CPX PAD3.xls,UVA
+215,CPX PAD4.xls,UVA
+216,CPX PAD5.xls,UVA
+217,CPX PAD6.xls,UVA
+218,CPX PAD7.xls,UVA
+219,CPX PAD8.xls,UVA
+220,CPX PAD9.xls,UVA
+221,CPX PAD10.xls,UVA
+222,CPX PADDM1.xls,UVA
+223,CPX PADDM2.xls,UVA
+224,CPX PADDM3.xls,UVA
+225,CPX PADDM4.xls,UVA
+226,CPX PADDM5.xls,UVA
+227,CPX PADDM6.xls,UVA
+228,CPX PADDM7.xls,UVA
+229,CPX PADDM8.xls,UVA
+230,CPX PADDM9.xls,UVA
+231,CPX PADDM10.xls,UVA

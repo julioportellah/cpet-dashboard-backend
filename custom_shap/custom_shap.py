@@ -1,4 +1,4 @@
-from . import colors
+import colors
 import numpy as np
 import matplotlib.pyplot as pl
 import uuid
@@ -27,8 +27,9 @@ labels = {
 
 
 def summary_with_highlight(shap_values, features=None, max_display=None, row_highlight=None, sort=True, plot_size="auto",
-                           axis_color="#333333", plot_type='dot', alpha=1, cmap=pl.get_cmap('viridis'), alt_cmap=colors.red_blue,
-                           show=True, class_inds=None, color_bar_label=labels["FEATURE_VALUE"], color_bar=True, as_string=False):
+                           axis_color="#333333", plot_type='dot', alpha=1, alt_cmap=colors.red_blue,
+                           show=True, class_inds=None, color_bar_label=labels["FEATURE_VALUE"], color_bar=True, 
+                           as_string=False, cmap=colors.red_blue):#pl.get_cmap('viridis')
     color = colors.blue_rgb
 
     idx2cat = None
@@ -63,7 +64,6 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
     elif plot_size is not None:
         pl.gcf().set_size_inches(8, len(feature_order) * plot_size + 1.5)
     pl.axvline(x=0, color="#999999", zorder=-1)
-
 
     if plot_type == "dot":
         for pos, i in enumerate(feature_order):
@@ -129,7 +129,7 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
                 cvals[cvals_imp < vmin] = vmin
                 xxx= shaps[np.invert(nan_mask)]
                 yyy = pos + ys[np.invert(nan_mask)]
-
+                
                 pl.scatter(shaps[np.invert(nan_mask)], pos + ys[np.invert(nan_mask)],
                            cmap=cmap, vmin=vmin, vmax=vmax, s=16,
                            c=cvals, alpha=alpha, linewidth=0,
@@ -137,12 +137,12 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
                 if row_highlight is not None:
                     dot_color = None
                     if shap_values[row_highlight][i]>=0:
-                        dot_color = np.array(["red"])
+                        dot_color = np.array(["red"])#np.array(["black"])
                     else:
-                        dot_color = np.array(["blue"])
+                        dot_color = np.array(["blue"]) #np.array(["black"]) 
                     pl.scatter(shap_values[row_highlight][i], pos,#yyy[-1],
                            cmap=None, vmin=vmin, vmax=vmax, s=128,
-                           c=dot_color, 
+                           c=dot_color, marker='o',
                            alpha=alpha, linewidth=0,
                            zorder=3, rasterized=len(shaps) > 500)
             else:
@@ -166,13 +166,29 @@ def summary_with_highlight(shap_values, features=None, max_display=None, row_hig
         cb.ax.set_aspect((bbox.height - 0.9) * 20)
         # cb.draw_all()
 
+    #print("---*********")
+    #print(feature_names.values)
+    #print(feature_order)
+    inverse_feature_order = feature_order
+    inverse_feature_order[:] = inverse_feature_order[::-1]
+    sort_features = []#[feature_names[i] for i in feature_order]
+    for ordr in inverse_feature_order:
+        sort_features.append(feature_names.values[ordr])
+    #print(sort_features)
+    #print([feature_names[i] for i in inverse_feature_order])
+    #print("-------------")
+    #print([feature_names[i] for i in feature_order][::-1])
+    #print("-------------")
+    
+    #print(range(len(feature_order)))
     pl.gca().xaxis.set_ticks_position('bottom')
     pl.gca().yaxis.set_ticks_position('none')
     pl.gca().spines['right'].set_visible(False)
     pl.gca().spines['top'].set_visible(False)
     pl.gca().spines['left'].set_visible(False)
     pl.gca().tick_params(color=axis_color, labelcolor=axis_color)
-    pl.yticks(range(len(feature_order)), [feature_names[i] for i in feature_order], fontsize=13)
+    #pl.yticks(ticks=range(len(feature_order)), labels=[feature_names[i] for i in feature_order], fontsize=13)
+    pl.yticks(ticks=range(len(feature_order)), labels=[feature_names[i] for i in inverse_feature_order][::-1], fontsize=13)
     if plot_type != "bar":
         pl.gca().tick_params('y', length=20, width=0.5, which='major')
     pl.gca().tick_params('x', labelsize=11)
